@@ -21,7 +21,6 @@ Para ello deberás seguir los siguientes pasos (más o menos):
 		
 8. Obtenemos y imprimimos el tamaño del recurso. ContentLength
 		
-9. Guardamos el stream a un fichero con el nombre del recurso en caso de que el código sea correcto.
-		
-10. Damos un error en caso de que el código sea incorrecto (BufferedInputStream -> FileOutputStream)
-		
+9. Guardamos el stream a un fichero con el nombre del recurso en caso de que el código sea correcto. (BufferedInputStream -> FileOutputStream)
+
+10. Damos un error en caso de que el código sea incorrecto 		
