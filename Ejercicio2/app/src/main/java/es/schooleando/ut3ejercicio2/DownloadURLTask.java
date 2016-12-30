@@ -6,6 +6,7 @@ import android.net.*;
 import android.os.AsyncTask;
 
 import java.io.*;
+import java.lang.ref.WeakReference;
 import java.net.*;
 
 
@@ -16,17 +17,19 @@ import java.net.*;
 
 public class DownloadURLTask extends AsyncTask<String,Integer,Bitmap> {
 
-    private DownloadActivity clase;
+    private MetodosDownloadURLTask metodos;
+    private WeakReference<Context> contexto;
     private String error;
 
-    public DownloadURLTask(DownloadActivity clase){
-        this.clase=clase;
+    public DownloadURLTask(Context contexto){
+        this.contexto=new WeakReference<> (contexto);
+        metodos = (MetodosDownloadURLTask)contexto;
     }
 
     @Override
     protected Bitmap doInBackground(String... params) {
         Bitmap bmp = null;
-        ConnectivityManager cm = (ConnectivityManager) clase.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) contexto.get().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo ni = cm.getActiveNetworkInfo();
         if (ni != null && ni.isConnected()) {
             URL url= null;
@@ -45,6 +48,7 @@ public class DownloadURLTask extends AsyncTask<String,Integer,Bitmap> {
                     byte[] b = new byte[1024];
 
                     for (int i; (i = in.read(b)) != -1; ) {
+                        if (contexto == null) cancel(true);
                         out.write(b, 0, i);
                         if (size>0) {
                             publishProgress(out.size() * 100 / size);
@@ -60,7 +64,7 @@ public class DownloadURLTask extends AsyncTask<String,Integer,Bitmap> {
                 }
 
             } catch (Exception e) {
-                cancelar("URL incorrecta"+e.getMessage());
+                cancelar("URL incorrecta "+e.getMessage());
             }
 
         } else {
@@ -81,16 +85,22 @@ public class DownloadURLTask extends AsyncTask<String,Integer,Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap b) {
-        clase.finDescarga(b);//fin de la descarga
+        if (this != null) {
+            metodos.finDescarga(b);//fin de la descarga
+        }
     }
 
     @Override
     protected void onProgressUpdate(Integer... values) {
-        clase.updateBar(values[0]);//actualización en onProgress de la barra y texto
+        if (contexto != null) {
+            metodos.updateBar(values[0]);//actualización en onProgress de la barra y texto
+        }
     }
 
     @Override
     protected void onCancelled() {
-        clase.cancelaDescarga(error);//cancelado de la descarga
+        if (contexto != null) {
+            metodos.cancelaDescarga(error);//cancelado de la descarga
+        }
     }
 }

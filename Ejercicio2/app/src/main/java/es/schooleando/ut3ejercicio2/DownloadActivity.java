@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 
-public class DownloadActivity extends AppCompatActivity {
+public class DownloadActivity extends AppCompatActivity implements MetodosDownloadURLTask{
 
     private ProgressBar pb;
     private EditText et;
